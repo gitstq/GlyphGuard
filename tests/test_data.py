@@ -1,6 +1,6 @@
 import unittest
 
-from glyphguard import data
+from glyphguard import core, data
 
 
 class TestDataTables(unittest.TestCase):
@@ -22,12 +22,12 @@ class TestDataTables(unittest.TestCase):
 
     def test_fullwidth_mapping(self):
         # FF41 -> 'a'
-        self.assertEqual(data.algorithmic_base("\uff41"), "a")
-        self.assertEqual(data.algorithmic_base("\uff21"), "A")
+        self.assertEqual(core.algorithmic_base("\uff41"), "a")
+        self.assertEqual(core.algorithmic_base("\uff21"), "A")
 
     def test_math_bold_mapping(self):
         # MATHEMATICAL BOLD SMALL A = U+1D41A -> 'a'
-        self.assertEqual(data.algorithmic_base("\U0001d41a"), "a")
+        self.assertEqual(core.algorithmic_base("\U0001d41a"), "a")
 
     def test_text_extensions_nonempty(self):
         self.assertIn(".py", data.TEXT_EXTENSIONS)

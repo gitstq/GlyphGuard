@@ -25,7 +25,7 @@ class TestCli(unittest.TestCase):
         self.assertIn(__version__, out)
 
     def test_skeleton(self):
-        code, out = self._run(["skeleton", "аррle"])
+        code, out = self._run(["skeleton", "\u0430\u0440\u0440le"])
         self.assertEqual(code, 0)
         self.assertIn("apple", out)
 
@@ -45,7 +45,7 @@ class TestCli(unittest.TestCase):
         self.assertIn("\u00e9", out)
 
     def test_domain(self):
-        code, out = self._run(["domain", "аррle.com"])
+        code, out = self._run(["domain", "\u0430\u0440\u0440le.com"])
         self.assertEqual(code, 2)
         self.assertIn("apple.com", out)
 

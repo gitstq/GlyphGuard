@@ -284,7 +284,7 @@ def escape_text(text: str, style: str = "unicode") -> str:
         if ch in ("\t", "\n", "\r"):
             out.append(ch)
             continue
-        if cp < 0x20 or cp == 0x7F or not ch.isprintable():
+        if cp < 0x20 or cp == 0x7F or cp >= 0x80:
             if style == "unicode":
                 if cp <= 0xFFFF:
                     out.append("\\u%04X" % cp)

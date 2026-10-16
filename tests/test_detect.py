@@ -27,7 +27,7 @@ class TestControl(unittest.TestCase):
 
 class TestConfusables(unittest.TestCase):
     def test_cyrillic_word(self):
-        findings = detect.find_confusables("аррle")
+        findings = detect.find_confusables("\u0430\u0440\u0440le")
         conf = [f for f in findings if f.kind == "confusable"]
         self.assertTrue(conf)
         self.assertTrue(all(f.severity == "critical" for f in conf))
@@ -39,7 +39,7 @@ class TestConfusables(unittest.TestCase):
 
 class TestMixedScripts(unittest.TestCase):
     def test_cyrillic_latin_mix(self):
-        findings = detect.find_mixed_scripts("аррle")
+        findings = detect.find_mixed_scripts("\u0430\u0440\u0440le")
         self.assertTrue(any(f.kind == "mixed-script" for f in findings))
 
     def test_cjk_latin_ok(self):
@@ -55,7 +55,7 @@ class TestNonNormalized(unittest.TestCase):
 
 class TestDomain(unittest.TestCase):
     def test_homograph(self):
-        skeleton, findings = detect.check_domain("аррle.com")
+        skeleton, findings = detect.check_domain("\u0430\u0440\u0440le.com")
         self.assertEqual(skeleton, "apple.com")
         self.assertTrue(findings)
 

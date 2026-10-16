@@ -69,7 +69,7 @@ class TestEscape(unittest.TestCase):
 
 class TestSkeleton(unittest.TestCase):
     def test_cyrillic_to_ascii(self):
-        self.assertEqual(core.skeleton("аррle"), "apple")
+        self.assertEqual(core.skeleton("\u0430\u0440\u0440le"), "apple")
 
     def test_fullwidth_skeleton(self):
         self.assertEqual(core.skeleton("\uff41\uff42"), "ab")

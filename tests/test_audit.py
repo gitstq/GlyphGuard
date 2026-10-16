@@ -19,7 +19,7 @@ class TestAuditText(unittest.TestCase):
 
     def test_stats(self):
         rep = audit.audit_text("变量 \u4e2d")
-        self.assertEqual(rep.stats["non_ascii"], 2)
+        self.assertEqual(rep.stats["non_ascii"], 3)
 
 
 class TestAuditFile(unittest.TestCase):
