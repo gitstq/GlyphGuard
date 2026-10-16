@@ -18,7 +18,9 @@ class TestDataTables(unittest.TestCase):
             # sample a few code points in each range and verify the mapping
             for cp in (start, (start + end) // 2, end):
                 base = chr(cp + offset)
-                self.assertTrue(base.isprintable(), hex(cp))
+                self.assertTrue(
+                    base.isascii() and base.isalnum(), (hex(cp), base)
+                )
 
     def test_fullwidth_mapping(self):
         # FF41 -> 'a'

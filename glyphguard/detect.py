@@ -246,63 +246,53 @@ def find_mixed_scripts(text: str) -> List[Finding]:
     findings: List[Finding] = []
     for start, word in core.iter_words(text):
         scripts = set()
+        has_latin = False
         for ch in word:
             s = core.script_of(ch)
-            if s in ("Latin", "Common", "Inherited", "Unknown"):
-                continue
-            scripts.add(s)
+            if s == "Latin":
+                has_latin = True
+            elif s not in ("Common", "Inherited", "Unknown"):
+                scripts.add(s)
         if not scripts:
             continue
-        # Allowed legitimate mixes: CJK scripts (+ Latin) and Math look-alikes.
+        # Pure CJK combinations (Han + Hiragana + Katakana + Hangul) are
+        # legitimate, as is CJK text that also contains Latin words.
         if scripts <= data.CJK_SCRIPTS:
             continue
-        if scripts <= data.CJK_SCRIPTS | {"Latin"}:
-            continue
-        # Anything that mixes a Latin-lookalike script with Latin/CJK.
         latin_like = scripts & data.LATIN_LOOKALIKE_SCRIPTS
         exotic = scripts & data.EXOTIC_SCRIPTS
-        if latin_like and (scripts - data.LATIN_LOOKALIKE_SCRIPTS) & (
-            {"Latin"} | data.CJK_SCRIPTS
-        ):
-            line, col = core.line_col(text, start)
-            findings.append(
-                Finding(
-                    kind="mixed-script",
-                    severity="critical",
-                    line=line,
-                    col=col,
-                    index=start,
-                    char=None,
-                    codepoint="",
-                    name="mixed script",
-                    message=(
-                        "word mixes %s with Latin/CJK — classic spoofing pattern"
-                        % ", ".join(sorted(latin_like))
-                    ),
-                    context=word,
-                    suggestion="review the word; it may impersonate another",
-                )
+        # A Latin-lookalike script (Cyrillic/Greek/...) appearing together with
+        # Latin letters inside one word is the canonical spoofing pattern.
+        if latin_like and (has_latin or len(scripts) > 1):
+            severity = "critical"
+            rest = scripts - latin_like
+            other = ", ".join(sorted(rest)) if rest else "Latin"
+            message = (
+                "word mixes %s with %s — classic spoofing pattern"
+                % (", ".join(sorted(latin_like)), other)
             )
-        elif exotic:
-            line, col = core.line_col(text, start)
-            findings.append(
-                Finding(
-                    kind="mixed-script",
-                    severity="warning",
-                    line=line,
-                    col=col,
-                    index=start,
-                    char=None,
-                    codepoint="",
-                    name="mixed script",
-                    message=(
-                        "word mixes unrelated scripts: %s"
-                        % ", ".join(sorted(scripts))
-                    ),
-                    context=word,
-                    suggestion="verify the word is intentional",
-                )
+        elif exotic and has_latin:
+            severity = "warning"
+            message = "word mixes unrelated scripts: %s" % ", ".join(
+                sorted(scripts | {"Latin"})
             )
+        else:
+            continue
+        findings.append(
+            Finding(
+                kind="mixed-script",
+                severity=severity,
+                line=core.line_col(text, start)[0],
+                col=core.line_col(text, start)[1],
+                index=start,
+                char=None,
+                codepoint="",
+                name="mixed script",
+                message=message,
+                context=word,
+                suggestion="review the word; it may impersonate another",
+            )
+        )
     return findings
 
 
