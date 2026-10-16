@@ -1,0 +1,74 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Syntax check
+        run: python -m compileall -q glyphguard
+
+      - name: Build executable .pyz (zipapp, zero-dependency, stdlib only)
+        shell: python
+        run: |
+          import os, shutil, zipapp
+          os.makedirs("dist", exist_ok=True)
+          if os.path.exists("stage"):
+              shutil.rmtree("stage")
+          shutil.copytree("glyphguard", os.path.join("stage", "glyphguard"))
+          out = "dist/glyphguard-${{ matrix.os }}.pyz"
+          zipapp.create_archive(
+              "stage",
+              out,
+              main="glyphguard.cli:main",
+              interpreter="/usr/bin/env python3",
+          )
+          print("built", out)
+
+      - name: Smoke test
+        shell: python
+        run: |
+          import glob, subprocess, sys
+          for f in glob.glob("dist/*.pyz"):
+              subprocess.run([sys.executable, f, "version"], check=True)
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: glyphguard-${{ matrix.os }}
+          path: dist/*.pyz
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Create GitHub Release and attach assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            --title "GlyphGuard ${GITHUB_REF_NAME}" \
+            --notes "Automated release of GlyphGuard ${GITHUB_REF_NAME}." \
+            artifacts/*.pyz --clobber

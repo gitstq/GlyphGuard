@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "glyphguard"
+version = "1.0.0"
+description = "Unicode homoglyph & invisible-character security audit engine"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+keywords = [
+    "unicode", "security", "homoglyph", "confusable", "trojan-source",
+    "invisible-character", "audit", "phishing", "cve-2021-42574",
+]
+authors = [{ name = "gitstq" }]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Security",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Text Processing :: Filters",
+]
+
+[project.urls]
+Homepage = "https://github.com/gitstq/GlyphGuard"
+Repository = "https://github.com/gitstq/GlyphGuard"
+Issues = "https://github.com/gitstq/GlyphGuard/issues"
+
+[project.scripts]
+glyphguard = "glyphguard.cli:main"
+
+[tool.setuptools]
+packages = ["glyphguard"]
