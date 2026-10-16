@@ -113,6 +113,10 @@ def _build_parser() -> argparse.ArgumentParser:
     p_dom.add_argument("name", help="domain name")
     p_dom.add_argument("--format", choices=["text", "json"], default="text")
 
+    p_ver = sub.add_parser(
+        "version", parents=[parent], help="show the GlyphGuard version"
+    )
+
     return parser
 
 
@@ -255,6 +259,11 @@ def cmd_inspect(args: argparse.Namespace, color: report.Color) -> int:
     return 0
 
 
+def cmd_version(args: argparse.Namespace, color: report.Color) -> int:
+    print("GlyphGuard v%s" % __version__)
+    return 0
+
+
 def cmd_domain(args: argparse.Namespace, color: report.Color) -> int:
     skeleton, findings = detect.check_domain(args.name)
     score = max(0, 100 - sum(audit.SEVERITY_WEIGHT[f.severity] for f in findings))
@@ -286,6 +295,7 @@ _HANDLERS = {
     "width": cmd_width,
     "inspect": cmd_inspect,
     "domain": cmd_domain,
+    "version": cmd_version,
 }
 
 
