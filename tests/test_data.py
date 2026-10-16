@@ -15,12 +15,15 @@ class TestDataTables(unittest.TestCase):
 
     def test_algorithmic_ranges_are_solid(self):
         for start, end, offset in data.ALGORITHMIC_CONFUSABLES:
-            # sample a few code points in each range and verify the mapping
             for cp in (start, (start + end) // 2, end):
                 base = chr(cp + offset)
-                self.assertTrue(
-                    base.isascii() and base.isalnum(), (hex(cp), base)
-                )
+                self.assertTrue(base.isascii(), (hex(cp), base))
+                self.assertTrue(0x21 <= ord(base) <= 0x7E, (hex(cp), base))
+                # Fullwidth forms legitimately map to ASCII punctuation; every
+                # other range must map to an ASCII letter or digit (guards
+                # against offset errors that would land on symbols like "@").
+                if not (0xFF01 <= cp <= 0xFF5E):
+                    self.assertTrue(base.isalnum(), (hex(cp), base))
 
     def test_fullwidth_mapping(self):
         # FF41 -> 'a'

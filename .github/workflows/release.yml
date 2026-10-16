@@ -70,5 +70,5 @@ jobs:
         run: |
           gh release create "${GITHUB_REF_NAME}" \
             --title "GlyphGuard ${GITHUB_REF_NAME}" \
-            --notes "Automated release of GlyphGuard ${GITHUB_REF_NAME}." \
-            artifacts/*.pyz --clobber
+            --notes "Automated release of GlyphGuard ${GITHUB_REF_NAME}. Single-file, zero-dependency .pyz builds for Windows, macOS and Linux." \
+            artifacts/*.pyz
